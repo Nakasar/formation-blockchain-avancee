@@ -1,0 +1,20 @@
+{
+  "name": "@intechlu/formation-ethereum-avancee-contracts",
+  "version": "2021.0.0",
+  "description": "Smart contract suites for the advanced ethereum training.",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Blockchain",
+    "Ethereum",
+    "Smart",
+    "Contracts",
+    "InTech",
+    "Formation"
+  ],
+  "author": "Kevin 'Nakasar' Thizy <kevin.thizy@intech.lu>",
+  "license": "UNLICENSED"
+}
