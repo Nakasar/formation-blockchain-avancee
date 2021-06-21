@@ -1,9 +1,10 @@
 pragma solidity >=0.7.4;
 
 import "./Permission.sol";
+import "@openzeppelin/contracts/proxy/Initializable.sol";
 
 
-contract Document {
+contract Document is Initializable {
 
     uint256 constant issueIdOperation = 1;
     uint256 constant revokeIdOperation = 10;
@@ -22,14 +23,13 @@ contract Document {
      * 2  -> redeemed
      */
 
-    constructor(address permission) {
-        permissionContract = permission;
+    function initialize(address permissionContractAddress) public initializer {
+        permissionContract = Permission(permissionContractAddress);
     }
 
 
     event issuanceMade (
         string hash,
-        uint256 timestampSubmitted,
         address indexed sender
     );
 

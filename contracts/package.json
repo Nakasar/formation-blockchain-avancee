@@ -1,20 +1,34 @@
 {
-  "name": "@intechlu/formation-ethereum-avancee-contracts",
-  "version": "2021.0.0",
-  "description": "Smart contract suites for the advanced ethereum training.",
-  "main": "index.js",
-  "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "ctie-smart-contract",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.intech.lu/bcsp-ctie/smart-contracts"
   },
-  "keywords": [
-    "Blockchain",
-    "Ethereum",
-    "Smart",
-    "Contracts",
-    "InTech",
-    "Formation"
-  ],
-  "author": "Kevin 'Nakasar' Thizy <kevin.thizy@intech.lu>",
-  "license": "UNLICENSED"
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.0",
+    "@openzeppelin/contracts": "^3.2.2-solc-0.7",
+    "@openzeppelin/hardhat-upgrades": "^1.3.0",
+    "@openzeppelin/truffle-upgrades": "^1.2.3",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.2.1",
+    "ethers": "^5.0.23",
+    "hardhat": "^2.0.8",
+    "pre-commit": "1.2.2",
+    "truffle": "5.1.53",
+    "truffle-assertions": "0.9.2",
+    "web3": "1.0.0-beta.55"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "compile": "npx hardhat compile",
+    "migrate": "truffle migrate"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "keythereum": "^1.2.0"
+  }
 }
