@@ -102,6 +102,7 @@ contract MultiSigWallet {
     /// @dev Contract constructor sets initial owners and required number of confirmations.
     /// @param _owners List of initial owners.
     /// @param _required Number of required confirmations.
+    /// Note in recent version of solidity this is renamed constructor
     function MultiSigWallet(address[] _owners, uint _required)
     public
     validRequirement(_owners.length, _required)

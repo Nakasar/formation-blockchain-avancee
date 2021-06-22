@@ -16,14 +16,14 @@ async function main() {
     const DocumentContract = await ethers.getContractFactory("contracts/v2/Document.sol:Document");
     const Permission = await ethers.getContractFactory("contracts/v2/Permission.sol:Permission");
     
-    let permissionContract = await Permission.deploy();
+    let permission = await Permission.deploy();
     
     /** Deploy **/
-    let documentContract = await upgrades.deployProxy(DocumentContract, [permissionContract.address]);
-    await documentContract.deployed();
+    let document = await upgrades.deployProxy(DocumentContract, [permissionContract.address]);
+    await document.deployed();
     
-    console.log("Permission Contract deployed to:", permissionContract.address);
-    console.log("StudentLoan Contract deployed to:", documentContract.address);
+    console.log("Permission Contract deployed to:", permission.address);
+    console.log("StudentLoan Contract deployed to:", document.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
