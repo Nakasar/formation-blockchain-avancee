@@ -25,7 +25,7 @@ describe("StudentLoan v3", function() {
   
     await permission.allowAddress(multisig.address, issueIdOperation);
     await permission.allowAddress(multisig.address, revokeIdOperation);
-  
+    
   });
   
   describe("Multisig", function (){
@@ -33,20 +33,31 @@ describe("StudentLoan v3", function() {
       console.log(await multisig.getOwners());
       expect(await multisig.getOwners()).to.have.same.members([owner.address, issueKey.address]);
     });
+    it("Should allow a owner to submit a transaction", async function (){
+      const data = DocumentContract.interface.encodeFunctionData("issueDocument", ["hash"]);
+      await expect(multisig.connect(owner).submitTransaction(document.address, 0, data)).to.emit(multisig, "Submission")
+    })
   })
   
   describe("Transactions", function (){
     it("Should allow an authorized multisig to issue a document", async function() {
-      // await document.connect(multisig).issueDocument("hash");
-      // expect(await document.getStatus("hash")).to.equal(1);
+      const data = DocumentContract.interface.encodeFunctionData("issueDocument", ["hash"]);
+      await expect(multisig.connect(owner).submitTransaction(document.address, 0, data)).to.emit(multisig, "Submission")
+      await expect(multisig.connect(issueKey).confirmTransaction(0)).to.emit(multisig, "Execution");
+      expect(await document.getStatus("hash")).to.equal(1);
+      
     });
     it("Should revert if an non-authorized account issue a document", async function() {
       await expect(document.connect(randomKey).revokeDocument("hash")).to.be.revertedWith("address is not allowed to perform this action");
     });
     it("Should allow an authorized account to revoke a document", async function() {
-      // await document.connect(issueKey).issueDocument("hash");
-      // await document.connect(revokeKey).revokeDocument("hash");
-      // expect(await document.getStatus("hash")).to.equal(10);
+      const data = DocumentContract.interface.encodeFunctionData("issueDocument", ["hash"]);
+      await expect(multisig.connect(owner).submitTransaction(document.address, 0, data)).to.emit(multisig, "Submission")
+      await expect(multisig.connect(issueKey).confirmTransaction(0)).to.emit(multisig, "Execution");
+      const dataRevoke = DocumentContract.interface.encodeFunctionData("revokeDocument", ["hash"]);
+      await expect(multisig.connect(owner).submitTransaction(document.address, 0, dataRevoke)).to.emit(multisig, "Submission")
+      await expect(multisig.connect(issueKey).confirmTransaction(1)).to.emit(multisig, "Execution")
+      expect(await document.getStatus("hash")).to.equal(10);
     });
   })
   
