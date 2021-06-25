@@ -13,17 +13,24 @@ const { ethers, upgrades, admin } = require("hardhat");
 
 async function main() {
     // We get the contract to deploy
-    const DocumentContract = await ethers.getContractFactory("contracts/v2/Document.sol:Document");
+    const DocumentContract = await ethers.getContractFactory("contracts/v1/Document.sol:Document");
+    const DocumentContractv2 = await ethers.getContractFactory("contracts/v2/Document.sol:Document");
     const Permission = await ethers.getContractFactory("contracts/v2/Permission.sol:Permission");
     
-    let permission = await Permission.deploy();
     
-    /** Deploy **/
-    let document = await upgrades.deployProxy(DocumentContract, [permissionContract.address]);
-    await document.deployed();
+    /** Deploy v1 **/
+    let document = await DocumentContract.deploy();
+    
+    /** Deploy v2 **/
+    let permission = await Permission.deploy();
+    // let document = await upgrades.deployProxy(DocumentContractv2, [permissionContract.address]);
+    // await document.deployed();
+    
+    /** add doc **/
+    await document.issueDocument("hash");
     
     console.log("Permission Contract deployed to:", permission.address);
-    console.log("StudentLoan Contract deployed to:", document.address);
+    console.log("Document Contract deployed to:", document.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
