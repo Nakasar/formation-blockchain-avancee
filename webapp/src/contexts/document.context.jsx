@@ -41,6 +41,10 @@ function DocumentContextProvider(props) {
         await document.issueDocument(hash);
     }
     
+    async function revokeDocument(hash) {
+        await document.revokeDocument(hash);
+    }
+    
     async function verifyDocument(hash) {
         return await document.verifyDocument(hash);
     }
@@ -52,6 +56,7 @@ function DocumentContextProvider(props) {
         loadDocument,
         fetchDocuments,
         issueDocument,
+        revokeDocument,
         verifyDocument
     };
     

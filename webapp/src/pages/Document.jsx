@@ -28,6 +28,10 @@ function Document() {
         await documentContext.issueDocument(hash);
     }
     
+    async function handleRevokeDocument(event, hash) {
+        await documentContext.revokeDocument(hash);
+    }
+    
     async function handleDocumentVerify(event) {
         const hash = Array.from(event).reduce((hash, char) => 0 | (31 * hash + char.charCodeAt(0)), 0);
         const status = await documentContext.verifyDocument(hash);
@@ -53,9 +57,13 @@ function Document() {
             </form>
             <h3> Document list </h3>
             <ul>
-            { documentContext.documents.map( doc => {
-                return <li key={doc.hash}> {doc.hash} | {doc.status}</li>
-            }) }
+            { documentContext.documents.map( doc =>
+                <li key={doc.hash}> {doc.hash} | {doc.status}
+                    <Button variant="contained" component="label" onClick={ event => handleRevokeDocument(event, doc.hash)}  >
+                        revoke Document
+                    </Button>
+                </li>
+            ) }
             </ul>
             <Button variant="contained" component="label" >
                 Upload Document

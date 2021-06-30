@@ -141,7 +141,6 @@ class Document {
     }
     
     async issueDocument(hash) {
-        console.log(hash);
         const signer = this.contract.provider.getSigner();
         const contractWithSigner = this.contract.connect(signer);
         const transaction = await contractWithSigner.issueDocument(hash.toString());
@@ -151,6 +150,19 @@ class Document {
             console.log("finit");
         });
     
+        return transaction;
+    }
+    
+    async revokeDocument(hash) {
+        const signer = this.contract.provider.getSigner();
+        const contractWithSigner = this.contract.connect(signer);
+        const transaction = await contractWithSigner.revokeDocument(hash.toString());
+        
+        transaction.wait().then(() => {
+            // onConfirmation();
+            console.log("finit");
+        });
+        
         return transaction;
     }
     
