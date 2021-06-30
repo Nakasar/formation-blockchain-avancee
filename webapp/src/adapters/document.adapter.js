@@ -107,17 +107,24 @@ class Document {
         return document;
     }
     
+    // get events
+    // filter hash
+    // get status for each hash
     async getDocuments() {
         const currentBlock = await this.contract.provider.getBlock();
         const documents = await this.contract.queryFilter('issuanceMade', currentBlock.number - 20);
-        console.log(documents);
-        return documents;
+        return await Promise.all(documents.map(document =>
+            document.args[0]
+        ).map( async hash => {
+            const status = await this.contract.getStatus(hash);
+            return {hash, status: status.toNumber() }
+        }))
     }
     
     listenForIssuance(callback) {
         this.contract.on('issuanceMade', (hash, sender, event) => {
-            console.log(event)
-            callback(event);
+            console.log(hash, sender, event)
+            callback({hash, status: 1});
         });
     }
     
@@ -131,6 +138,25 @@ class Document {
         });
         
         return transaction;
+    }
+    
+    async issueDocument(hash) {
+        console.log(hash);
+        const signer = this.contract.provider.getSigner();
+        const contractWithSigner = this.contract.connect(signer);
+        const transaction = await contractWithSigner.issueDocument(hash.toString());
+    
+        transaction.wait().then(() => {
+            // onConfirmation();
+            console.log("finit");
+        });
+    
+        return transaction;
+    }
+    
+    async verifyDocument(hash) {
+        const status = await this.contract.getStatus(hash.toString());
+        return status;
     }
     
     constructor({ documentContract }) {

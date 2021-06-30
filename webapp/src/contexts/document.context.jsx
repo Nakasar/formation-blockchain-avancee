@@ -36,6 +36,14 @@ function DocumentContextProvider(props) {
             documents: await document.getDocuments() ?? [],
         });
     }
+    
+    async function issueDocument(hash) {
+        await document.issueDocument(hash);
+    }
+    
+    async function verifyDocument(hash) {
+        return await document.verifyDocument(hash);
+    }
 
     const value = {
         loaded,
@@ -43,6 +51,8 @@ function DocumentContextProvider(props) {
         documents,
         loadDocument,
         fetchDocuments,
+        issueDocument,
+        verifyDocument
     };
     
     return (
