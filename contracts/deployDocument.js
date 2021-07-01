@@ -22,14 +22,14 @@ async function main() {
     let document = await DocumentContract.deploy();
     
     /** Deploy v2 **/
-    let permission = await Permission.deploy();
+    // let permission = await Permission.deploy();
     // let document = await upgrades.deployProxy(DocumentContractv2, [permissionContract.address]);
     // await document.deployed();
     
     /** add doc **/
-    await document.issueDocument("hash");
+    // await document.issueDocument("hash");
     
-    console.log("Permission Contract deployed to:", permission.address);
+    // console.log("Permission Contract deployed to:", permission.address);
     console.log("Document Contract deployed to:", document.address);
 }
 
