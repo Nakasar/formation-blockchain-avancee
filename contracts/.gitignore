@@ -7,3 +7,7 @@
 .artifacts/
 .openzeppelin/
 .cache/
+
+# Artifacts
+artifacts/
+cache/

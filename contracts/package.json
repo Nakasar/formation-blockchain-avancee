@@ -1,10 +1,6 @@
 {
-  "name": "ctie-smart-contract",
+  "name": "contracts",
   "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": "https://gitlab.intech.lu/bcsp-ctie/smart-contracts"
-  },
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -24,7 +20,7 @@
   },
   "scripts": {
     "test": "truffle test",
-    "compile": "npx hardhat compile",
+    "compile": "hardhat compile",
     "migrate": "truffle migrate"
   },
   "dependencies": {
