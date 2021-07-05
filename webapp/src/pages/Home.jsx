@@ -2,14 +2,14 @@ import {useWeb3} from "../contexts/web3.context";
 
 function Home() {
     const wallet = useWeb3();
-    
+
     return (
         <div>
             <h1>dApp starter kit</h1>
-            
+
             {wallet.loaded ?
                 <div>
-                    <p>Connecté avec le wallet {wallet.walletAddress}.</p>
+                    <p>Connecté avec le wallet {wallet.walletAddress} sur la chaîne {wallet.chainId}.</p>
                 </div>
                 : <p>Vous devez connecter un wallet.</p>
             }

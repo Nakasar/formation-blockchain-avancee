@@ -8,17 +8,18 @@ const Web3Context = React.createContext({ loaded: false });
 function Web3ContextProvider(props) {
     const [loaded, setLoaded] = React.useState(false);
     const [provider, setProvider] = React.useState(null);
+    const [chainId, setChainId] = React.useState(null);
     const [walletAddress, setWalletAddress] = React.useState('');
-    
+
     async function loadWallet() {
         if (loaded) {
             throw new Error('WALLET_ALREADY_LOADED');
         }
-        
+
         if (typeof window.ethereum === 'undefined') {
             throw new Error('ETHEREUM_NOT_INSTALLED');
         }
-        
+
         const providerOptions = {
             cacheProvider: true,
             walletconnect: {
@@ -32,16 +33,16 @@ function Web3ContextProvider(props) {
                 }
             }
         };
-        
+
         const web3Modal = new Web3Modal({
             providerOptions,
         });
-        
+
         const selectedProvider = await web3Modal.connect();
-        
+
         // Subscribe to provider connection
         selectedProvider.on("connect", async (info) => {});
-        
+
         // Subscribe to accounts change
         selectedProvider.on("accountsChanged", (accounts) => {
             if (accounts.length > 0) {
@@ -50,41 +51,49 @@ function Web3ContextProvider(props) {
             } else {
                 setLoaded(false);
                 setWalletAddress('');
+                setChainId(null);
             }
         });
-        
+
+        selectedProvider.on("chainChanged", (chainId) => {
+            setChainId(chainId);
+        });
+
         // Subscribe to provider disconnection
         selectedProvider.on("disconnect", (error) => {
             setLoaded(false);
             setWalletAddress('');
+            setChainId(null);
         });
-        
+
         const web3provider = new providers.Web3Provider(selectedProvider);
-        
+
         setProvider(web3provider);
         setWalletAddress(await web3provider.getSigner().getAddress());
+        setChainId((await web3provider.getNetwork()).chainId);
         setLoaded(true);
     }
-    
+
     async function unloadWallet() {
         if (!loaded) {
             throw new Error('WALLET_NOT_LOADED');
         }
-        
+
         setLoaded(false);
         setWalletAddress('');
-        
+
         window.ethereum.removeAllListeners('accountsChanged');
     }
-    
+
     let value = {
         loaded,
         loadWallet,
         provider,
         unloadWallet,
         walletAddress,
+        chainId,
     };
-    
+
     return (
         <Web3Context.Provider value={value}>{props.children}</Web3Context.Provider>
     );

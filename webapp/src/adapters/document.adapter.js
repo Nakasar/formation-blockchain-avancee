@@ -102,75 +102,82 @@ class Document {
             abi,
             provider,
         );
-        
+
         const document = new Document({ documentContract });
         return document;
     }
-    
+
     // get events
     // filter hash
     // get status for each hash
     async getDocuments() {
         const currentBlock = await this.contract.provider.getBlock();
-        const documents = await this.contract.queryFilter('issuanceMade', currentBlock.number - 20);
-        return await Promise.all(documents.map(document =>
-            document.args[0]
-        ).map( async hash => {
-            const status = await this.contract.getStatus(hash);
-            return {hash, status: status.toNumber() }
+        const issuanceMadeEvents = await this.contract.queryFilter('issuanceMade', currentBlock.number - 20);
+        return await Promise.all(issuanceMadeEvents.map( async event => {
+            const status = await this.contract.getStatus(event.args[0]);
+
+            const block = await event.getBlock();
+
+            console.log(block);
+
+            return { hash: event.args[0], status: status.toNumber(), blockNumber: event.blockNumber, timestamp: block.timestamp, date: new Date(block.timestamp * 1000) };
         }))
     }
-    
+
     listenForIssuance(callback) {
-        this.contract.on('issuanceMade', (hash, sender, event) => {
-            console.log(hash, sender, event)
-            callback({hash, status: 1});
+        this.contract.on('issuanceMade', async (hash, sender, event) => {
+            const block = await event.getBlock();
+            callback({hash, status: 1, blockNumber: event.blockNumber, timestamp: block.timestamp, date: new Date(block.timestamp * 1000) });
         });
     }
-    
+
+    removeAllListeners() {
+        this.contract.removeAllListeners();
+    }
+
     async pause(onConfirmation) {
         const signer = this.contract.provider.getSigner();
         const contractWithSigner = this.contract.connect(signer);
         const transaction = await contractWithSigner.pause();
-        
+
         transaction.wait().then(() => {
             onConfirmation();
         });
-        
+
         return transaction;
     }
-    
+
     async issueDocument(hash) {
         const signer = this.contract.provider.getSigner();
         const contractWithSigner = this.contract.connect(signer);
         const transaction = await contractWithSigner.issueDocument(hash.toString());
-    
+
         transaction.wait().then(() => {
             // onConfirmation();
             console.log("finit");
         });
-    
+
         return transaction;
     }
-    
+
     async revokeDocument(hash) {
         const signer = this.contract.provider.getSigner();
         const contractWithSigner = this.contract.connect(signer);
         const transaction = await contractWithSigner.revokeDocument(hash.toString());
-        
+
         transaction.wait().then(() => {
             // onConfirmation();
             console.log("finit");
         });
-        
+
         return transaction;
     }
-    
+
     async verifyDocument(hash) {
         const status = await this.contract.getStatus(hash.toString());
         return status;
     }
-    
+
     constructor({ documentContract }) {
         this.contract = documentContract;
         this.address = documentContract.address;
@@ -184,10 +191,10 @@ class DocumentAdapter {
             abi,
             provider,
         );
-        
+
         return documentContract.name();
     }
-    
+
     async instantiateDocument(address, provider) {
         return Document.instantiate(address, provider);
     }
