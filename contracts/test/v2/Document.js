@@ -2,30 +2,30 @@ const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
 
 
-describe("StudentLoan v2", function() {
-  
+describe("Documents v2", function() {
+
   let DocumentContract, PermissionContract;
   let permission, document;
   let owner, issueKey, revokeKey, randomKey;
   const issueIdOperation = 1;
   const revokeIdOperation = 10;
-  
+
   beforeEach(async function () {
     [owner, issueKey, revokeKey, randomKey] = await ethers.getSigners();
     DocumentContract = await ethers.getContractFactory("contracts/v2/Document.sol:Document");
     PermissionContract = await ethers.getContractFactory("contracts/v2/Permission.sol:Permission");
-  
+
     permission = await PermissionContract.deploy();
-  
+
     /** Deploy **/
     document = await upgrades.deployProxy(DocumentContract, [permission.address]);
     await document.deployed();
-  
+
     await permission.allowAddress(issueKey.address, issueIdOperation);
     await permission.allowAddress(revokeKey.address, revokeIdOperation);
-  
+
   });
-  
+
   describe("Transactions", function (){
     it("Should allow an authorized account to issue a document", async function() {
       await document.connect(issueKey).issueDocument("hash");
@@ -46,7 +46,7 @@ describe("StudentLoan v2", function() {
       await expect(document.connect(randomKey).revokeDocument("hash")).to.be.revertedWith("address is not allowed to perform this action");
     });
   })
-  
+
   // describe("Upgrade", function () {
   //   beforeEach(async function(){
   //     await studentLoan.connect(issueKey).issueLoan("hash", 10001);
