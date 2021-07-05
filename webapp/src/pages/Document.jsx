@@ -1,8 +1,8 @@
 import {Button, Container, Table, TableBody, TableCell, TableHead, TableRow, TextField} from "@material-ui/core";
 import {useEffect, useState} from "react";
+
 import {useDocument} from "../contexts/document.context";
 import {useWeb3} from "../contexts/web3.context";
-
 
 function Document() {
   const web3 = useWeb3();
@@ -14,7 +14,7 @@ function Document() {
     if (documentContext.loaded) {
       fetchDocumentTransfers();
     }
-  }, [documentContext.loaded, documentContext.document?.address])
+  }, [documentContext.loaded, documentContext.documentContract?.address])
 
   async function loadDocumentContract() {
     await documentContext.loadDocumentContract(web3.provider);
@@ -25,7 +25,8 @@ function Document() {
   }
 
   async function handleDocument(event) {
-    const hash = Array.from(event).reduce((hash, char) => 0 | (31 * hash + char.charCodeAt(0)), 0);
+    const hash = await documentContext.documentContract.hashDocument(event.target.files[0]);
+
     await documentContext.issueDocument(hash);
   }
 
@@ -34,7 +35,7 @@ function Document() {
   }
 
   async function handleDocumentVerify(event) {
-    const hash = Array.from(event).reduce((hash, char) => 0 | (31 * hash + char.charCodeAt(0)), 0);
+    const hash = await documentContext.documentContract.hashDocument(event.target.files[0]);
     const status = await documentContext.verifyDocument(hash);
     console.log("status: ", status.toNumber());
   }
@@ -96,11 +97,11 @@ function Document() {
 
           <Button variant="contained" color="primary" component="label">
             Upload Document
-            <input type="file" hidden onChange={event => handleDocument(event.target.value)}/>
+            <input type="file" hidden onChange={handleDocument}/>
           </Button>
           <Button varia nt="contained" component="label">
             Verify Document
-            <input type="file" hidden onChange={event => handleDocumentVerify(event.target.value)}/>
+            <input type="file" hidden onChange={handleDocumentVerify}/>
           </Button>
         </>
       )}

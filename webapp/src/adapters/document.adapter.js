@@ -1,4 +1,7 @@
 import { ethers } from "ethers";
+import BMF from 'browser-md5-file';
+
+const bmf = new BMF();
 
 const abi = [
     {
@@ -105,6 +108,22 @@ class Document {
 
         const document = new Document({ documentContract });
         return document;
+    }
+
+    async hashDocument(file) {
+        return new Promise((resolve, reject) => {
+            bmf.md5(
+              file,
+              (err, md5) => {
+                  if (err) {
+                      reject(new Error('Failed to hash the document.'));
+                  }
+
+                  resolve(md5);
+              },
+              progress => {},
+            );
+        })
     }
 
     // get events
