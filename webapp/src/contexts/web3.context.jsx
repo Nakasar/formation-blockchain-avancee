@@ -1,7 +1,4 @@
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { providers } from 'ethers';
 import React from 'react';
-import Web3Modal from "web3modal";
 
 const Web3Context = React.createContext({ loaded: false });
 
@@ -20,58 +17,14 @@ function Web3ContextProvider(props) {
             throw new Error('ETHEREUM_NOT_INSTALLED');
         }
 
-        const providerOptions = {
-            cacheProvider: true,
-            walletconnect: {
-                package: WalletConnectProvider,
-                options: {
-                    infuraId: process.env.REACT_APP_INFURA_ID,
-                    rpc: {
-                        1: 'https://rpc-mumbai.maticvigil.com/',
-                        2: 'https://rpc-mainnet.maticvigil.com/'
-                    }
-                }
-            }
-        };
+        // @TODO : Initialiser la connexion avec le wallet. Ne pas oublier les évènements de changement de réseau ou de compte !
 
-        const web3Modal = new Web3Modal({
-            providerOptions,
-        });
-
-        const selectedProvider = await web3Modal.connect();
-
-        // Subscribe to provider connection
-        selectedProvider.on("connect", async (info) => {});
-
-        // Subscribe to accounts change
-        selectedProvider.on("accountsChanged", (accounts) => {
-            if (accounts.length > 0) {
-                setWalletAddress(accounts[0]);
-                setLoaded(true);
-            } else {
-                setLoaded(false);
-                setWalletAddress('');
-                setChainId(null);
-            }
-        });
-
-        selectedProvider.on("chainChanged", (chainId) => {
-            setChainId(chainId);
-        });
-
-        // Subscribe to provider disconnection
-        selectedProvider.on("disconnect", (error) => {
-            setLoaded(false);
-            setWalletAddress('');
-            setChainId(null);
-        });
-
-        const web3provider = new providers.Web3Provider(selectedProvider);
-
-        setProvider(web3provider);
+        /**
+        setProvider(web3Provider);
         setWalletAddress(await web3provider.getSigner().getAddress());
         setChainId((await web3provider.getNetwork()).chainId);
         setLoaded(true);
+         */
     }
 
     async function unloadWallet() {
@@ -82,7 +35,7 @@ function Web3ContextProvider(props) {
         setLoaded(false);
         setWalletAddress('');
 
-        window.ethereum.removeAllListeners('accountsChanged');
+        window.ethereum.removeAllListeners('accountsChanged'); // On retire bien tous les évènements pour éviter les fuites mémoire.
     }
 
     let value = {

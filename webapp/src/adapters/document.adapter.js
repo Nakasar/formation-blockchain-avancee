@@ -1,113 +1,13 @@
-import { ethers } from "ethers";
 import BMF from 'browser-md5-file';
 
 const bmf = new BMF();
 
-const abi = [
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "hash",
-                "type": "string"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            }
-        ],
-        "name": "issuanceMade",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "hash",
-                "type": "string"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            }
-        ],
-        "name": "issuanceRevoked",
-        "type": "event"
-    },
-    {
-        "stateMutability": "payable",
-        "type": "fallback"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "hash",
-                "type": "string"
-            }
-        ],
-        "name": "getStatus",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "hash",
-                "type": "string"
-            }
-        ],
-        "name": "issueDocument",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "hash",
-                "type": "string"
-            }
-        ],
-        "name": "revokeDocument",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-];
-
 class Document {
     static async instantiate(address, provider) {
-        const documentContract = new ethers.Contract(
-            address,
-            abi,
-            provider,
-        );
+        // @TODO : instancier le contrat de document avec son ABI (Human Readable Interface ou JSON).
+        const documentContract = null;
 
-        const document = new Document({ documentContract });
-        return document;
+        return new Document({ documentContract });
     }
 
     async hashDocument(file) {
@@ -123,77 +23,40 @@ class Document {
               },
               progress => {},
             );
-        })
+        });
     }
 
     // get events
     // filter hash
     // get status for each hash
     async getDocuments() {
-        const currentBlock = await this.contract.provider.getBlock();
-        const issuanceMadeEvents = await this.contract.queryFilter('issuanceMade', currentBlock.number - 20);
-        return await Promise.all(issuanceMadeEvents.map( async event => {
-            const status = await this.contract.getStatus(event.args[0]);
-
-            const block = await event.getBlock();
-
-            console.log(block);
-
-            return { hash: event.args[0], status: status.toNumber(), blockNumber: event.blockNumber, timestamp: block.timestamp, date: new Date(block.timestamp * 1000) };
-        }))
+        // @TODO : Récupérer les documents émis. (Utiliser les évènements blockchain).
     }
 
     listenForIssuance(callback) {
-        this.contract.on('issuanceMade', async (hash, sender, event) => {
-            const block = await event.getBlock();
-            callback({hash, status: 1, blockNumber: event.blockNumber, timestamp: block.timestamp, date: new Date(block.timestamp * 1000) });
-        });
+        // @TODO : ajouter un listener sur l'évènement d'émission de document et appeler la callback.
+
+        /**
+         * callback({ hash, status: 1, blockNumber, timestamp, date: (ISO string of date) });
+         */
     }
 
     removeAllListeners() {
-        this.contract.removeAllListeners();
-    }
-
-    async pause(onConfirmation) {
-        const signer = this.contract.provider.getSigner();
-        const contractWithSigner = this.contract.connect(signer);
-        const transaction = await contractWithSigner.pause();
-
-        transaction.wait().then(() => {
-            onConfirmation();
-        });
-
-        return transaction;
+        // @TODO : retirer tous les listener du contrat.
     }
 
     async issueDocument(hash) {
-        const signer = this.contract.provider.getSigner();
-        const contractWithSigner = this.contract.connect(signer);
-        const transaction = await contractWithSigner.issueDocument(hash.toString());
-
-        transaction.wait().then(() => {
-            // onConfirmation();
-            console.log("finit");
-        });
-
-        return transaction;
+        // @TODO : Emettre un document.
     }
 
     async revokeDocument(hash) {
-        const signer = this.contract.provider.getSigner();
-        const contractWithSigner = this.contract.connect(signer);
-        const transaction = await contractWithSigner.revokeDocument(hash.toString());
-
-        transaction.wait().then(() => {
-            // onConfirmation();
-            console.log("finit");
-        });
-
-        return transaction;
+        // @TODO : Révoquer un document.
     }
 
     async verifyDocument(hash) {
-        const status = await this.contract.getStatus(hash.toString());
+        // @TODO : Récupérer le status d'un document sur le contrat.
+        const status = null;
+
         return status;
     }
 
@@ -204,16 +67,6 @@ class Document {
 }
 
 class DocumentAdapter {
-    async getDocumentName(address, provider) {
-        const documentContract = new ethers.Contract(
-            address,
-            abi,
-            provider,
-        );
-
-        return documentContract.name();
-    }
-
     async instantiateDocument(address, provider) {
         return Document.instantiate(address, provider);
     }

@@ -5,10 +5,6 @@ const documentAdapter = new DocumentAdapter();
 
 const DocumentContext = React.createContext({ loaded: false });
 
-const documentContracts = {
-    1337: '0x08302DEeEefEEd76B63a2b80c5Ca20873774AD79',
-};
-
 function DocumentContextProvider(props) {
     const [loaded, setLoaded] = React.useState(false);
     const [documentContract, setDocumentContract] = React.useState(null);
@@ -22,22 +18,14 @@ function DocumentContextProvider(props) {
     }, []);
 
     async function loadDocumentContract(provider) {
-        const network = await provider.getNetwork();
 
-        if (!documentContracts[network.chainId]) {
-            throw new Error(`No document contrat for this network: ${network.chainId}.`);
-        }
+        // @TODO : Récupérer l'adresse du contrat de documents pour le réseau actuel (par chain ID).
 
-        const contract = await documentAdapter.instantiateDocument(documentContracts[network.chainId], provider);
+        const contract = await documentAdapter.instantiateDocument(' contract address ', provider);
         setDocumentContract(contract);
         setLoaded(true);
 
-        contract.listenForIssuance((document) => {
-            dispatchDocuments({
-                action: 'ADD',
-                document,
-            });
-        });
+        // @TODO : Ajouter un listener pour les évènements d'ajout de documents.
     }
 
     async function unloadDocumentContract() {
